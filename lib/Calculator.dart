@@ -604,9 +604,46 @@ class MathUtils {
 
   static double geometricCdf(int k, double p) {
     if (k < 1) return 0;
-    return (1 - math.pow(1 - p, k)).toDouble();
+    return 1 - math.pow(1 - p, k).toDouble();
   }
 
+  // --- RANDOM GENERATION (Monte Carlo) ---
+  
+  static List<double> generateNormal(int n, double mean, double stdDev) {
+    List<double> samples = [];
+    var rng = math.Random();
+    
+    // Box-Muller transform
+    for (int i = 0; i < n; i++) {
+        double u1 = rng.nextDouble();
+        double u2 = rng.nextDouble();
+        
+        // Handle potential exact 0 which is problematic for log
+        while (u1 <= 0) u1 = rng.nextDouble();
+        
+        double z0 = math.sqrt(-2.0 * math.log(u1)) * math.cos(2.0 * math.pi * u2);
+        // z1 not used here, could buffer it for efficiency but simple loop for now
+        samples.add(mean + stdDev * z0);
+    }
+    return samples;
+  }
+
+  static List<double> generateExponential(int n, double lambda) {
+    List<double> samples = [];
+    var rng = math.Random();
+    
+    // Inverse Transform Sampling
+    // F(x) = 1 - e^(-lambda * x)  =>  u = 1 - e^(-lambda * x)
+    // 1 - u = e^(-lambda * x) => ln(1-u) = -lambda * x => x = -ln(1-u)/lambda
+    // Since 1-u is also U(0,1), we can just use -ln(u)/lambda
+    
+    for (int i = 0; i < n; i++) {
+       double u = rng.nextDouble();
+       while (u <= 0) u = rng.nextDouble();
+       samples.add(-math.log(u) / lambda);
+    }
+    return samples;
+  }
   // --- PDF FUNCTIONS & FITTING ---
 
   static double pdfNormal(double x, double mean, double stdDev) {
