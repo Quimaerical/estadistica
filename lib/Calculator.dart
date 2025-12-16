@@ -1258,34 +1258,27 @@ class _DistributionCalculatorScreenState extends State<DistributionCalculatorScr
         break;
     }
 
-    if (_relation == 'eq') return "P(X = $x) = 0 (Variable Continua)";
+    if (_relation == 'eq') return "f($x) = ${pdf.toStringAsFixed(5)} (Densidad)";
     
     double res = 0;
     String sign = "";
-    String formula = "";
     
     if (_relation == 'le' || _relation == 'lt') {
       res = cdf;
       sign = _relation == 'le' ? "≤" : "<";
-      formula = "CDF($x)";
     } else {
       res = 1 - cdf;
       sign = _relation == 'ge' ? "≥" : ">";
-      formula = "1 - CDF($x)";
     }
     
-    return "P(X $sign $x) = $formula\n= ${res.toStringAsFixed(5)}";
+    String formula = _getFormula(_selectedDist, sign, x, p1, p2);
+    
+    return "P(X $sign $x) =\n$formula\n= ${res.toStringAsFixed(5)}";
   }
 
   String _computeDiscreteP(double? p1, double? p2, double val) {
-    // Discrete Logic
-    // P(X <= val) -> cdf(floor(val))
-    // P(X < val)  -> cdf(ceil(val) - 1)
-    
     int k_le = val.floor();
     int k_lt = val.ceil() - 1;
-    
-    // For P(X = val), check if val is integer (approx)
     bool isInt = (val - val.round()).abs() < 1e-9;
     
     double getCdf(int k) {
@@ -1308,34 +1301,74 @@ class _DistributionCalculatorScreenState extends State<DistributionCalculatorScr
 
     if (_relation == 'eq') {
       if (!isInt) return "P(X = $val) = 0 (No entero)";
-      return "P(X = ${val.toInt()}) = PMF(${val.toInt()})\n= ${getPmf(val.round()).toStringAsFixed(5)}";
+      String formula = _getFormula(_selectedDist, "=", val, p1, p2);
+      return "P(X = ${val.toInt()}) = $formula\n= ${getPmf(val.round()).toStringAsFixed(5)}";
     }
 
     double res = 0;
     String sign = "";
-    String formula = "";
     
     if (_relation == 'le') {
       res = getCdf(k_le);
       sign = "≤";
-      formula = "CDF($k_le)";
     } else if (_relation == 'lt') {
       res = getCdf(k_lt);
       sign = "<";
-      formula = "CDF($k_lt) [k < ${val.toString()}]";
     } else if (_relation == 'ge') {
-      // P(X >= val) = 1 - P(X < val)
       res = 1 - getCdf(k_lt);
       sign = "≥";
-      formula = "1 - CDF($k_lt)";
     } else if (_relation == 'gt') {
-      // P(X > val) = 1 - P(X <= val)
       res = 1 - getCdf(k_le);
       sign = ">";
-      formula = "1 - CDF($k_le)";
     }
+    
+    String formula = _getFormula(_selectedDist, sign, val, p1, p2);
 
-    return "P(X $sign $val) = $formula\n= ${res.toStringAsFixed(5)}";
+    return "P(X $sign $val) =\n$formula\n= ${res.toStringAsFixed(5)}";
+  }
+  
+  String _getFormula(String dist, String sign, double val, double? p1, double? p2) {
+    String p1s = (p1 ?? 0).toString();
+    String p2s = (p2 ?? 0).toString();
+    String xs = val.toString();
+    
+    bool isUpper = sign == '>' || sign == '≥';
+    
+    switch (dist) {
+      case 'Normal':
+        if (isUpper) return "∫($xs to ∞) (1/σ√2π)·e^(-½((t-μ)/σ)²) dt";
+        return "∫(-∞ to $xs) (1/σ√2π)·e^(-½((t-μ)/σ)²) dt";
+        
+      case 'Exponencial':
+        if (isUpper) return "e^(-λ·$xs)";
+        return "1 - e^(-λ·$xs)";
+        
+      case 'Uniforme':
+        if (isUpper) return "(b - $xs) / (b - a)";
+        return "($xs - a) / (b - a)";
+        
+      case 'Binomial':
+        if (sign == '=') return "nCx · p^x · (1-p)^(n-x)";
+        if (isUpper) return "Σ(k=$xs to n) [nCk · p^k · (1-p)^(n-k)]";
+        return "Σ(k=0 to $xs) [nCk · p^k · (1-p)^(n-k)]";
+        
+      case 'Poisson':
+        if (sign == '=') return "(e^(-λ) · λ^x) / x!";
+        if (isUpper) return "1 - Σ(i=0 to $xs) [(e^(-λ)λ^i)/i!]";
+        return "Σ(i=0 to $xs) [(e^(-λ)λ^i)/i!]";
+
+      case 'Geométrica':
+        if (sign == '=') return "(1-p)^(x-1) · p";
+        if (isUpper) return "(1-p)^$xs"; 
+        return "1 - (1-p)^$xs";
+
+      case 'Gamma':
+        return isUpper ? "1 - (1/Γ(α))·γ(α, β·x)" : "(1/Γ(α))·γ(α, β·x)";
+        
+      default:
+        if (isUpper) return "1 - CDF($xs)";
+        return "CDF($xs)";
+    }
   }
 
   String _getP1Label() {
