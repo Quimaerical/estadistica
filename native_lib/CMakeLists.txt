@@ -10,7 +10,6 @@ include(FetchContent)
 FetchContent_Declare(
     gcem
     GIT_REPOSITORY https://github.com/kthohr/gcem.git
-    GIT_TAG        v1.17.0
 )
 FetchContent_MakeAvailable(gcem)
 
@@ -18,17 +17,19 @@ FetchContent_MakeAvailable(gcem)
 FetchContent_Declare(
     stats
     GIT_REPOSITORY https://github.com/kthohr/stats.git
-    GIT_TAG        v4.5.0
 )
+
 FetchContent_MakeAvailable(stats)
 
-set(SOURCES src/hypothesis.cpp)
-
+set(SOURCES src/hypothesis.cpp src/anova_rlm.cpp)
 # Creado para FFI
 add_library(stat_engine SHARED ${SOURCES})
 
-target_include_directories(stat_engine PUBLIC include)
-target_link_libraries(stat_engine PRIVATE stats gcem)
+target_include_directories(stat_engine PUBLIC 
+    include
+    ${stats_SOURCE_DIR}/include
+    ${gcem_SOURCE_DIR}/include
+)
 
 set_target_properties(stat_engine PROPERTIES
     C_VISIBILITY_PRESET hidden

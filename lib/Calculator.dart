@@ -9,6 +9,10 @@ import 'MonteCarloScreen.dart';
 import 'DistributionsGuideScreen.dart';
 import 'views/inference_calculator_screen.dart';
 import 'features/hypothesis_test/views/advanced_hypothesis_screen.dart';
+import 'features/hypothesis_test/views/p_value_calculator_screen.dart';
+import 'features/hypothesis_test/views/critical_value_screen.dart';
+import 'features/project_defense/ui/ProyectoParte1ANOVA.dart';
+import 'features/project_defense/ui/ProyectoParte2RLM.dart';
 
 void main() {
   runApp(const StatApp());
@@ -108,6 +112,26 @@ class MenuScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         children: [
           _MenuButton(
+            icon: Icons.stars,
+            title: 'Proyecto Final - Parte 1 (ANOVA)',
+            subtitle: 'Análisis de Red SwiftPay',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProyectoParte1ANOVA()),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _MenuButton(
+            icon: Icons.timeline,
+            title: 'Proyecto Final - Parte 2 (RLM CPU)',
+            subtitle: 'Predicción de Telemetría (OLS)',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProyectoParte2RLM()),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _MenuButton(
             icon: Icons.analytics,
             title: 'Analizador Estadístico Definitivo',
             subtitle: 'Media, Varianza, Histogramas, etc.',
@@ -149,6 +173,30 @@ class MenuScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => const AdvancedHypothesisScreen(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _MenuButton(
+            icon: Icons.calculate_outlined,
+            title: 'Calculadora de Valor p (Z)',
+            subtitle: 'Integral exacta Z (C++ Nativo)',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => PValueCalculatorScreen(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _MenuButton(
+            icon: Icons.table_chart_outlined,
+            title: 'Valores Críticos (Inversas)',
+            subtitle: 'Z, T, Chi² (C++ Nativo)',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CriticalValueScreen(),
               ),
             ),
           ),

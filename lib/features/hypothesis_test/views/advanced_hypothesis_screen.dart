@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import '../domain/usecases/hypothesis_orchestrator.dart';
 import '../domain/entities/test_result.dart';
 import '../widgets/hypothesis_graph.dart';
-import '../../../../core/utils/number_formatter.dart';
+import '../../../core/utils/number_formatter.dart';
 
 class AdvancedHypothesisScreen extends StatefulWidget {
   const AdvancedHypothesisScreen({super.key});

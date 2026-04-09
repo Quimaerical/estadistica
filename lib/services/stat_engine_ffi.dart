@@ -43,15 +43,21 @@ class StatEngineFFI {
   late StatCriticalChi2FDart statCriticalChi2;
   late StatCriticalFFDart statCriticalF;
 
+  // Proyecto Final
+  late StatAnovaDart statAnova1Way;
+  late StatRunsDart statRunsTest;
+  late StatCochranDart statCochranTest;
+  late StatRlmDart statRlmFit;
+
   StatEngineFFI._internal() {
     if (Platform.isAndroid) {
-      _lib = DynamicLibrary.open('libestadistica_native.so');
+      _lib = DynamicLibrary.open('libstat_engine.so');
     } else if (Platform.isWindows) {
-      _lib = DynamicLibrary.open('estadistica_native.dll');
+      _lib = DynamicLibrary.open('stat_engine.dll');
     } else if (Platform.isIOS || Platform.isMacOS) {
       _lib = DynamicLibrary.process();
     } else {
-      _lib = DynamicLibrary.open('libestadistica_native.so');
+      _lib = DynamicLibrary.open('libstat_engine.so');
     }
 
     // P-Values
@@ -65,5 +71,27 @@ class StatEngineFFI {
     statCriticalT = _lib.lookupFunction<StatCriticalTNative, StatCriticalTDart>('stat_critical_t');
     statCriticalChi2 = _lib.lookupFunction<StatCriticalChi2FNative, StatCriticalChi2FDart>('stat_critical_chi2');
     statCriticalF = _lib.lookupFunction<StatCriticalFFNative, StatCriticalFFDart>('stat_critical_f');
+
+    // Módulo Proyecto Final
+    statAnova1Way = _lib.lookupFunction<StatAnovaNative, StatAnovaDart>('stat_anova_1way');
+    statRunsTest = _lib.lookupFunction<StatRunsNative, StatRunsDart>('stat_runs_test');
+    statCochranTest = _lib.lookupFunction<StatCochranNative, StatCochranDart>('stat_cochran_test');
+    statRlmFit = _lib.lookupFunction<StatRlmNative, StatRlmDart>('stat_rlm_fit');
   }
 }
+
+// ------------------------------------------------------------------------
+// MÓDULO 6: Proyecto Final FFI Types
+// ------------------------------------------------------------------------
+typedef StatAnovaNative = Void Function(Pointer<Double> data1, Int32 n1, Pointer<Double> data2, Int32 n2, Pointer<Double> data3, Int32 n3, Pointer<Double> outResults);
+typedef StatAnovaDart = void Function(Pointer<Double> data1, int n1, Pointer<Double> data2, int n2, Pointer<Double> data3, int n3, Pointer<Double> outResults);
+
+typedef StatRunsNative = Double Function(Pointer<Double> sequence, Int32 n);
+typedef StatRunsDart = double Function(Pointer<Double> sequence, int n);
+
+typedef StatCochranNative = Double Function(Pointer<Double> data1, Int32 n1, Pointer<Double> data2, Int32 n2, Pointer<Double> data3, Int32 n3);
+typedef StatCochranDart = double Function(Pointer<Double> data1, int n1, Pointer<Double> data2, int n2, Pointer<Double> data3, int n3);
+
+typedef StatRlmNative = Void Function(Pointer<Double> x1, Pointer<Double> x2, Pointer<Double> x3, Pointer<Double> x4, Pointer<Double> y, Int32 n, Pointer<Double> outBeta, Pointer<Double> outMetrics);
+typedef StatRlmDart = void Function(Pointer<Double> x1, Pointer<Double> x2, Pointer<Double> x3, Pointer<Double> x4, Pointer<Double> y, int n, Pointer<Double> outBeta, Pointer<Double> outMetrics);
+

@@ -59,4 +59,19 @@ extern "C" {
 }
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    // ------------------------------------------------------------------------
+    // MÓDULO 6: Proyecto Final - ANOVA y Regresión Lineal Múltiple
+    // ------------------------------------------------------------------------
+    FFI_EXPORT void stat_anova_1way(const double* data1, int n1, const double* data2, int n2, const double* data3, int n3, double* out_results);
+    FFI_EXPORT double stat_runs_test(const double* sequence, int n);
+    FFI_EXPORT double stat_cochran_test(const double* data1, int n1, const double* data2, int n2, const double* data3, int n3);
+    FFI_EXPORT void stat_rlm_fit(const double* x1, const double* x2, const double* x3, const double* x4,
+                                 const double* y_vec, int n, double* out_beta, double* out_metrics);
+#ifdef __cplusplus
+}
+#endif
+
 #endif // STAT_ENGINE_H
